@@ -40,6 +40,17 @@ body {
     height: 5rem;
     font-size: 2rem;
     background-color: #a0a0a0;
+    box-shadow: inset 1px 1px 2px white;
+}
+
+.regular-buttons:active, .double-width-buttons:active {
+    box-shadow: inset -1px -1px 2px white;
+}
+
+*:disabled, *:disabled:active, *:disabled:hover {
+    box-shadow: none;
+    background-color: #6c6c6c;
+    color: black;
 }
 
 .double-width-buttons {
@@ -47,5 +58,5 @@ body {
 }
 
 .github-icon {
-    height: 4rem;
+    height: 3rem;
 }
