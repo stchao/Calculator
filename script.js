@@ -217,15 +217,28 @@ function getButtonNameByValue(value) {
 
 function updateDisplay(num = '') {
     let display = document.querySelector("#display");
+
+    if (num.length > 15) {        
+        num = "Overflow";
+        clearCalculation(false);
+    }
+
+    if (num.length > 9) {
+        num = String(Number(num).toExponential(3));
+    }
+
     display.innerText = num;
 }
 
-function clearCalculation() {
+function clearCalculation(resetDisplay = true) {
     toggleOperatorButton();    
     for (let calcProp in storedValues) {
         storedValues[calcProp] = '';
     }
-    updateDisplay("0");
+
+    if (resetDisplay) {
+        updateDisplay("0");
+    }
 }
 
 function navigateToGithub() {
