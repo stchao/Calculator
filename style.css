@@ -1,4 +1,16 @@
+html {
+    height: 100%;
+}
+
+body {
+    min-height: 100%;
+    display: flex;
+    margin: 0;
+    background-color: #d3d3d3;
+}
+
 #container {
+    background-color: black;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -9,6 +21,7 @@
 }
 
 #display {
+    background-color: white;
     height: 5rem;
     width: 100%;
     margin-bottom: 0.5rem;
@@ -19,18 +32,18 @@
 
 #container, #display {
     border: 1px solid black;
+    border-radius: 1rem;
 }
 
-.regular-buttons {
+.regular-buttons, .double-width-buttons {
     width: 5rem;
     height: 5rem;
     font-size: 2rem;
+    background-color: #a0a0a0;
 }
 
 .double-width-buttons {
     width: 10.25rem;
-    height: 5rem;
-    font-size: 2rem;
 }
 
 .github-icon {
