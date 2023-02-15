@@ -70,12 +70,12 @@ function onButtonClick(ev) {
     let isValueDotOrPlusMinus = buttonValue === "+/-" || buttonValue === ".";
 
     if (isValueDotOrPlusMinus) {
-        otherOperate(buttonValue);
+        applyOtherOperators(buttonValue);
         return;
     }    
 
     if (isOperatorPickedAlready && storedValues.num2) {
-        isOperateSuccessful = operate();
+        isOperateSuccessful = getResult();
     }
 
     if (isOperateSuccessful && !isEqualClicked) {
@@ -104,31 +104,28 @@ function divide(num1, num2) {
 
 function operate() {
     let num1 = Number(storedValues.num1);
-    let num2 = Number(storedValues.num2);    
-    let result = "Invalid op";
-    
+    let num2 = Number(storedValues.num2);
 
     switch (storedValues.operator) {
         case "+":
-            result = add(num1, num2);
-            break;
+            return add(num1, num2);
         case "-":
-            result = subtract(num1, num2);
-            break;
+            return subtract(num1, num2);
         case "/":
             if (num2 === 0) {
-                result = "Can't / by 0";
-                break;
+                return "Can't / by 0";
             }
-            result = divide(num1, num2);
-            break;
+
+            return divide(num1, num2);
         case "*":
-            result = multiply(num1, num2);
-            break;
+            return multiply(num1, num2);
         default:
-            break;
-    }
-    
+            return "Invalid op";
+    } 
+}
+
+function getResult() {
+    let result = operate();
     let isValidNumber = !isNaN(result);    
     let buttonName = getButtonNameByValue(storedValues.operator);
 
@@ -145,7 +142,7 @@ function operate() {
     return true;
 }
 
-function otherOperate(symbol) {    
+function applyOtherOperators(symbol) {    
     let isOperatorPickedAlready = storedValues.operator;
     let numProperty = !isOperatorPickedAlready ? "num1" : "num2";
     let isValidCondition = false;
@@ -167,7 +164,7 @@ function otherOperate(symbol) {
             // adds 0 in front, if no num before decimal
             newNum = `${(storedValues[numProperty] || '0')}.`;
 
-            if (isValidCondition) {
+            if (isValidCondition || newNum.length > 8) {
                 return;
             }            
             break;
@@ -180,6 +177,10 @@ function otherOperate(symbol) {
 }
 
 function updateNum(num, numProperty = "num1") {
+    if (storedValues[numProperty].length > 8) {
+        return;
+    }
+
     let isDecimal = String(num).includes(".") || storedValues[numProperty].includes(".");
     let tempNum = storedValues[numProperty] + num;
     storedValues[numProperty] = isDecimal ? tempNum : String(Number(tempNum));
