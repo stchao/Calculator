@@ -25,43 +25,37 @@ function setButtons() {
 function onButtonClick(ev) {
     let buttonValue = ev.target.value;
     let isNumber = !isNaN(Number(buttonValue));
-    let isOperatorPickedAlready = currentCalculation.operator;    
+    let isOperateSuccessful = true;
+    let isOperatorPickedAlready = currentCalculation.operator;
+    let isOperatorMisclicked = buttonValue === currentCalculation.previousButton;
+    let isEqualClicked = buttonValue === '=';
 
     if (isNumber && !isOperatorPickedAlready) {
-        currentCalculation.num1 += buttonValue;
-        currentCalculation.previousButton = buttonValue;
-        updateDisplay(currentCalculation.num1)
+        updateNum(buttonValue, "num1");
         return;
     }
 
     if (isNumber && isOperatorPickedAlready) {
-        currentCalculation.num2 += buttonValue;
-        currentCalculation.previousButton = buttonValue;
-        updateDisplay(currentCalculation.num2)
+        updateNum(buttonValue, "num2");
         return;
     }
 
-    if (isOperatorPickedAlready && buttonValue !== currentCalculation.previousButton) {
-        let result = operate();
-        let isValidNumber = !isNaN(result);
-        clearCalculation();
+    let isValueDotOrPlusMinus = buttonValue === "+/-" || buttonValue === ".";
 
-        if (!isValidNumber) {            
-            updateDisplay(result);
-            return;
-        }
+    if (isValueDotOrPlusMinus) {
+        otherOperate(buttonValue);
+        return;
+    }    
 
-        currentCalculation.num1 = result;
-        updateDisplay(result);
+    if (isOperatorPickedAlready && !isOperatorMisclicked) {
+        isOperateSuccessful = operate();
     }
 
-    currentCalculation.operator = buttonValue;
-    currentCalculation.previousButton = buttonValue;
-}
+    if (isOperateSuccessful && !isEqualClicked) {
+        currentCalculation.operator = buttonValue;
+    }
 
-function updateDisplay(num = '') {
-    let display = document.querySelector("#display");
-    display.innerText = num;
+    currentCalculation.previousButton = buttonValue;
 }
 
 function add(num1, num2) {
@@ -82,22 +76,86 @@ function divide(num1, num2) {
 
 function operate() {
     let num1 = Number(currentCalculation.num1);
-    let num2 = Number(currentCalculation.num2);
+    let num2 = Number(currentCalculation.num2);    
+    let result = "Invalid op";
 
-    switch(currentCalculation.operator) {
+    switch (currentCalculation.operator) {
         case "+":
-            return add(num1, num2);
+            result = add(num1, num2);
+            break;
         case "-":
-            return subtract(num1, num2);
+            result = subtract(num1, num2);
+            break;
         case "/":
             if (num2 === 0) {
-                return "Can't / by 0";
+                result = "Can't / by 0";
+                break;
             }
-            return divide(num1, num2);
+            result = divide(num1, num2);
+            break;
         case "*":
-            return multiply(num1, num2);
-
+            result = multiply(num1, num2);
+            break;
+        default:
+            break;
     }
+    
+    let isValidNumber = !isNaN(result);
+
+    clearCalculation();
+
+    if (!isValidNumber) {            
+        updateDisplay(result);
+        return false;
+    }
+
+    updateNum(result, "num1");
+    return true;
+}
+
+function otherOperate(symbol) {    
+    let isOperatorPickedAlready = currentCalculation.operator;
+    let numProperty = !isOperatorPickedAlready ? "num1" : "num2";
+    let isValidCondition = false;
+    let newNum = currentCalculation[numProperty];
+    currentCalculation.previousButton = symbol;
+
+    switch (symbol) {
+        case "+/-":
+            // is current num negative
+            isValidCondition = currentCalculation[numProperty].includes("-");
+            newNum = `-${currentCalculation[numProperty]}`;
+
+            if (isValidCondition) {
+                newNum = currentCalculation[numProperty].replace('-', '');
+            }
+            break;
+        case ".":
+            // is num already a decimal
+            isValidCondition = currentCalculation[numProperty].includes(".");
+            newNum = `${currentCalculation[numProperty]}.`;
+
+            if (isValidCondition) {
+                return;
+            }            
+            break;
+        default:
+            return;
+    }
+
+    currentCalculation[numProperty] = '';            
+    updateNum(newNum, numProperty);   
+}
+
+function updateNum(num, numProperty = "num1") {
+    currentCalculation[numProperty] += num;
+    currentCalculation.previousButton = num;
+    updateDisplay(currentCalculation[numProperty]);
+}
+
+function updateDisplay(num = '') {
+    let display = document.querySelector("#display");
+    display.innerText = num;
 }
 
 function clearCalculation() {
